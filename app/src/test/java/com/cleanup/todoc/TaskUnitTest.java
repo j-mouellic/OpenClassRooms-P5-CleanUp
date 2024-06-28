@@ -1,8 +1,13 @@
 package com.cleanup.todoc;
 
 import com.cleanup.todoc.model.Task;
+import com.cleanup.todoc.model.dao.ProjectDao;
+import com.cleanup.todoc.model.dao.TaskDao;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,12 +17,24 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+
 /**
  * Unit tests for tasks
  *
  * @author Gaëtan HERFRAY
  */
 public class TaskUnitTest {
+
+    private ProjectDao projectDao;
+    private TaskDao taskDao;
+
+    @Before
+    public void createDb(){
+      // TODO : Initialiser la db et les dao
+    }
+
     @Test
     public void test_projects() {
         final Task task1 = new Task(1, 1, "task 1", new Date().getTime());

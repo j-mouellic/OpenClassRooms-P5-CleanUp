@@ -6,6 +6,7 @@ import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.util.Comparator;
@@ -17,20 +18,21 @@ import java.util.Comparator;
  */
 @Entity(tableName = "tasks",
         foreignKeys = @ForeignKey(entity = Project.class,
-        parentColumns = "project_id",
-        childColumns = "projectId",
+        parentColumns = "id",
+        childColumns = "project_id",
         onDelete = ForeignKey.CASCADE))
 public class Task {
     /**
      * The unique identifier of the task
      */
-    @ColumnInfo(name = "task_id")
+    @ColumnInfo(name = "id")
     @PrimaryKey(autoGenerate = true)
     private long id;
 
     /**
      * The unique identifier of the project associated to the task
      */
+    @ColumnInfo(name = "project_id", index = true)
     private long projectId;
 
     /**
@@ -59,6 +61,13 @@ public class Task {
         this.setProjectId(projectId);
         this.setName(name);
         this.setCreationTimestamp(creationTimestamp);
+    }
+
+    @Ignore
+    public Task(long projectId, @NonNull String name, long creationTimestamp){
+        this.projectId = projectId;
+        this.name = name;
+        this.creationTimestamp = creationTimestamp;
     }
 
     /**
