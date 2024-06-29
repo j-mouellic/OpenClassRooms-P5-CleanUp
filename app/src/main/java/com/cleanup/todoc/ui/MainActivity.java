@@ -2,8 +2,6 @@ package com.cleanup.todoc.ui;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,20 +21,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cleanup.todoc.R;
-import com.cleanup.todoc.di.ViewModelFactory;
-import com.cleanup.todoc.model.Database;
+import com.cleanup.todoc.di.Injection;
+import com.cleanup.todoc.viewmodel.ViewModelFactory;
 import com.cleanup.todoc.model.Project;
 import com.cleanup.todoc.model.Task;
-import com.cleanup.todoc.model.dao.ProjectDao;
-import com.cleanup.todoc.model.repository.ProjectRepository;
 import com.cleanup.todoc.viewmodel.TaskViewModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * <p>Home activity of the application which is displayed when the user opens the app.</p>
@@ -45,17 +38,6 @@ import java.util.concurrent.Executors;
  * @author Gaëtan HERFRAY
  */
 public class MainActivity extends AppCompatActivity implements TasksAdapter.DeleteTaskListener {
-    /**
-     * List of all projects available in the application
-     */
-    private List<Project> allProjects;
-
-    /**
-     * List of all current tasks of the application
-     */
-    @NonNull
-    private ArrayList<Task> tasks = new ArrayList<>();
-    private int tasks_number = 0;
 
     /**
      * The adapter which handles the list of tasks
@@ -94,6 +76,9 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
     @NonNull
     private RecyclerView listTasks;
 
+    /**
+     * ViewModel that provide projects and tasks live data
+     */
     private TaskViewModel taskViewModel;
 
     /**
@@ -110,8 +95,8 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
 
         setContentView(R.layout.activity_main);
 
-        ViewModelFactory factory = ViewModelFactory.getInstance(this);
-        taskViewModel = new ViewModelProvider(this, factory).get(TaskViewModel.class);
+        ViewModelFactory viewModelFactory = Injection.provideViewModelFactory(this);
+        taskViewModel = new ViewModelProvider(this, viewModelFactory).get(TaskViewModel.class);
 
         listTasks = findViewById(R.id.list_tasks);
         lblNoTasks = findViewById(R.id.lbl_no_task);
@@ -119,16 +104,8 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
         listTasks.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         listTasks.setAdapter(adapter);
 
-        taskViewModel.getTasks().observe(this, new Observer<List<Task>>() {
-            @Override
-            public void onChanged(List<Task> tasksList) {
-                tasks.clear();
-                tasks.addAll(tasksList);
-                updateTasks();
-                adapter.setTasks(tasksList);
-                adapter.notifyDataSetChanged();
-            }
-        });
+        observeProjectLiveData();
+        observeTasksLiveData();
 
         findViewById(R.id.fab_add_task).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,6 +114,33 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
             }
         });
     }
+
+
+    /**
+     * Observes the LiveData for tasks and updates the UI when the data changes.
+     */
+    public void observeTasksLiveData(){
+        taskViewModel.getTasks().observe(this, new Observer<List<Task>>() {
+            @Override
+            public void onChanged(List<Task> tasksList) {
+                updateTasks(tasksList);
+                adapter.updateTasks(tasksList);
+            }
+        });
+    }
+
+    /**
+     * Observes the LiveData for projects and updates the UI when the data changes.
+     */
+    public void observeProjectLiveData(){
+        taskViewModel.getProjects().observe(this, new Observer<List<Project>>() {
+            @Override
+            public void onChanged(List<Project> projects) {
+                adapter.updateProjects(projects);
+            }
+        });
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -158,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
             sortMethod = SortMethod.RECENT_FIRST;
         }
 
-        updateTasks();
+        observeTasksLiveData();
 
         return super.onOptionsItemSelected(item);
     }
@@ -225,7 +229,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
     /**
      * Updates the list of tasks in the UI
      */
-    private void updateTasks() {
+    private void updateTasks(List<Task> tasks) {
         if (tasks.size() == 0) {
             lblNoTasks.setVisibility(View.VISIBLE);
             listTasks.setVisibility(View.GONE);
@@ -298,12 +302,14 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
      */
     private void populateDialogSpinner() {
         ArrayAdapter<Project> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item);
+
         taskViewModel.getProjects().observe(this, new Observer<List<Project>>() {
             @Override
             public void onChanged(List<Project> projects) {
                 adapter.addAll(projects);
             }
         });
+
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         if (dialogSpinner != null) {
             dialogSpinner.setAdapter(adapter);

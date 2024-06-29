@@ -54,12 +54,6 @@ public class TaskViewModel extends ViewModel {
         });
     }
 
-    public void addProject(Project project) {
-        executor.execute(() -> {
-            projectRepository.insertProject(project);
-        });
-    }
-
     /**
      * Deletes the specified task from the repository.
      * @param task the task to be deleted

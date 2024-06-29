@@ -31,7 +31,6 @@ public abstract class Database extends RoomDatabase {
      */
     public static synchronized Database getInstance(Context context){
         if (instance == null){
-            Log.i("DEBUG", "🟢🟢🟢 getInstance ");
             instance = Room.databaseBuilder(
                     context.getApplicationContext(),
                     Database.class,
@@ -40,7 +39,6 @@ public abstract class Database extends RoomDatabase {
                     .allowMainThreadQueries() //- autorise accès thread principal pour les tests
                     .build();
         }
-        Log.i("DEBUG", "🟢🟢🟢 return ");
         return instance;
     }
 
@@ -57,7 +55,6 @@ public abstract class Database extends RoomDatabase {
             @Override
             public void onCreate(@NonNull SupportSQLiteDatabase db) {
                 super.onCreate(db);
-                Log.i("DEBUG", "🟢🟢🟢 Prepopulate ");
 
                 Project[] projects = Project.getAllProjects();
 
@@ -67,7 +64,6 @@ public abstract class Database extends RoomDatabase {
                     contentValues.put("name", project.getName());
                     contentValues.put("color", project.getColor());
 
-                    Log.i("DEBUG", "🟢🟢🟢 Inserting project: " + project.getName());
 
                     // OnConflictStrategy.IGNORE - Use to ignore insert if contentvalues is already in DB
                     db.insert("projects", OnConflictStrategy.IGNORE, contentValues);

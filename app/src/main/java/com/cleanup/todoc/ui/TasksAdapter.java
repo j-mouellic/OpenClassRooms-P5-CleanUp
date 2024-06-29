@@ -15,6 +15,7 @@ import com.cleanup.todoc.R;
 import com.cleanup.todoc.model.Project;
 import com.cleanup.todoc.model.Task;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,6 +30,8 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
     @NonNull
     private List<Task> tasks;
 
+    private List<Project> projects;
+
     /**
      * The listener for when a task needs to be deleted
      */
@@ -37,19 +40,15 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
 
     /**
      * Instantiates a new TasksAdapter.
-     *
-     * @param tasks the list of tasks the adapter deals with to set
      */
 
     // @NonNull final List<Task> tasks, ---  this.tasks = tasks;
     TasksAdapter(@NonNull final DeleteTaskListener deleteTaskListener) {
         this.deleteTaskListener = deleteTaskListener;
+        projects = new ArrayList<>(); // Eviter null pointer exception
+        tasks = new ArrayList<>();
     }
 
-    public void setTasks(@NonNull List<Task> tasks) {
-        Log.i("DEBUG", "Set task");
-        this.tasks = tasks;
-    }
 
     /**
      * Updates the list of tasks the adapter deals with.
@@ -58,6 +57,11 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
      */
     void updateTasks(@NonNull final List<Task> tasks) {
         this.tasks = tasks;
+        notifyDataSetChanged();
+    }
+
+    void updateProjects(@NonNull final List<Project> projects) {
+        this.projects = projects;
         notifyDataSetChanged();
     }
 
@@ -161,7 +165,14 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
             lblTaskName.setText(task.getName());
             imgDelete.setTag(task);
 
-            final Project taskProject = task.getProject();
+            Project taskProject = null;
+
+            for(Project project : projects){
+                if (project.getId() == task.getProjectId()){
+                    taskProject = project;
+                }
+            }
+
             if (taskProject != null) {
                 imgProject.setSupportImageTintList(ColorStateList.valueOf(taskProject.getColor()));
                 lblProjectName.setText(taskProject.getName());
