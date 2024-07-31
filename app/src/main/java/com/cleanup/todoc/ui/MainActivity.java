@@ -119,12 +119,11 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
     /**
      * Observes the LiveData for tasks and updates the UI when the data changes.
      */
-    public void observeTasksLiveData(){
+    private void observeTasksLiveData(){
         taskViewModel.getTasks().observe(this, new Observer<List<Task>>() {
             @Override
             public void onChanged(List<Task> tasksList) {
                 updateTasks(tasksList);
-                adapter.updateTasks(tasksList);
             }
         });
     }
@@ -132,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
     /**
      * Observes the LiveData for projects and updates the UI when the data changes.
      */
-    public void observeProjectLiveData(){
+    private void observeProjectLiveData(){
         taskViewModel.getProjects().observe(this, new Observer<List<Project>>() {
             @Override
             public void onChanged(List<Project> projects) {
@@ -205,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
                 dialogInterface.dismiss();
             }
         }
-        // If dialog is aloready closed
+        // If dialog is already closed
         else {
             dialogInterface.dismiss();
         }
@@ -236,6 +235,7 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
         } else {
             lblNoTasks.setVisibility(View.GONE);
             listTasks.setVisibility(View.VISIBLE);
+
             switch (sortMethod) {
                 case ALPHABETICAL:
                     Collections.sort(tasks, new Task.TaskAZComparator());
@@ -250,8 +250,8 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
                     Collections.sort(tasks, new Task.TaskOldComparator());
                     break;
             }
-            adapter.updateTasks(tasks);
         }
+        adapter.updateTasks(tasks);
     }
 
     /**
@@ -306,7 +306,9 @@ public class MainActivity extends AppCompatActivity implements TasksAdapter.Dele
         taskViewModel.getProjects().observe(this, new Observer<List<Project>>() {
             @Override
             public void onChanged(List<Project> projects) {
+                adapter.clear();
                 adapter.addAll(projects);
+                adapter.notifyDataSetChanged();
             }
         });
 

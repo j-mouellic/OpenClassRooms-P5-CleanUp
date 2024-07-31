@@ -67,14 +67,14 @@ public class Project {
      * @param id the unique identifier of the project to return
      * @return the project with the given unique identifier, or null if it has not been found
      */
-    /*@Nullable
-    private static Project getProjectById(long id) {
+    @Nullable
+    public static Project getProjectById(long id) {
         for (Project project : getAllProjects()) {
             if (project.id == id)
                 return project;
         }
         return null;
-    }*/
+    }
 
     /**
      * Returns the unique identifier of the project.

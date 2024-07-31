@@ -30,6 +30,9 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
     @NonNull
     private List<Task> tasks;
 
+    /**
+     * The list of projects the adapter deals with
+     */
     private List<Project> projects;
 
     /**
@@ -79,11 +82,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
 
     @Override
     public int getItemCount() {
-        if (tasks == null){
-            return 0;
-        }else{
-            return tasks.size();
-        }
+        return tasks.size();
     }
 
     /**
@@ -132,7 +131,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
         /**
          * Instantiates a new TaskViewHolder.
          *
-         * @param itemView the view of the task item
+         * @param itemView           the view of the task item
          * @param deleteTaskListener the listener for when a task needs to be deleted to set
          */
         TaskViewHolder(@NonNull View itemView, @NonNull DeleteTaskListener deleteTaskListener) {
@@ -167,9 +166,10 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
 
             Project taskProject = null;
 
-            for(Project project : projects){
-                if (project.getId() == task.getProjectId()){
+            for (Project project : projects) {
+                if (project.getId() == task.getProjectId()) {
                     taskProject = project;
+                    break;
                 }
             }
 
@@ -180,7 +180,6 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
                 imgProject.setVisibility(View.INVISIBLE);
                 lblProjectName.setText("");
             }
-
         }
     }
 }
