@@ -110,10 +110,10 @@ public class Task {
      *
      * @return the project associated to the task
      */
-    /*@Nullable
-    private Project getProject() {
+    @Nullable
+    public Project getProject() {
         return Project.getProjectById(projectId);
-    }*/
+    }
 
     /**
      * Returns the name of the task.

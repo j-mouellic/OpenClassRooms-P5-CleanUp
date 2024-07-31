@@ -27,13 +27,6 @@ import android.content.pm.ApplicationInfo;
  */
 public class TaskUnitTest {
 
-    private ProjectDao projectDao;
-    private TaskDao taskDao;
-
-    @Before
-    public void createDb(){
-      // TODO : Initialiser la db et les dao
-    }
 
     @Test
     public void test_projects() {

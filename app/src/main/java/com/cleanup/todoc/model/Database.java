@@ -2,7 +2,6 @@ package com.cleanup.todoc.model;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.room.OnConflictStrategy;
@@ -13,6 +12,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import com.cleanup.todoc.model.dao.ProjectDao;
 import com.cleanup.todoc.model.dao.TaskDao;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 
 @androidx.room.Database(entities = {Project.class, Task.class}, version = 1, exportSchema = false)
 public abstract class Database extends RoomDatabase {
@@ -20,6 +21,7 @@ public abstract class Database extends RoomDatabase {
     // --- DAO ---
     public abstract ProjectDao getProjectDao();
     public abstract TaskDao getTaskDao();
+    private static AtomicBoolean isRunningTest;
 
 
     // --- SINGLETON ---
@@ -31,13 +33,21 @@ public abstract class Database extends RoomDatabase {
      */
     public static synchronized Database getInstance(Context context){
         if (instance == null){
-            instance = Room.databaseBuilder(
-                    context.getApplicationContext(),
-                    Database.class,
-                    "app_db"
-            ).addCallback(prepopulateDataBase())
-                    .allowMainThreadQueries() //- autorise accès thread principal pour les tests
-                    .build();
+            if (isRunningTest()){
+                instance = Room.inMemoryDatabaseBuilder(
+                                context.getApplicationContext(),
+                                Database.class
+                        ).addCallback(prepopulateDataBase())
+                        .allowMainThreadQueries() //- autorise accès thread principal pour les tests
+                        .build();
+            }else{
+                instance = Room.databaseBuilder(
+                                context.getApplicationContext(),
+                                Database.class,
+                                "app_db"
+                        ).addCallback(prepopulateDataBase())
+                        .build();
+            }
         }
         return instance;
     }
@@ -64,11 +74,29 @@ public abstract class Database extends RoomDatabase {
                     contentValues.put("name", project.getName());
                     contentValues.put("color", project.getColor());
 
-
                     // OnConflictStrategy.IGNORE - Use to ignore insert if contentvalues is already in DB
                     db.insert("projects", OnConflictStrategy.IGNORE, contentValues);
                 }
             }
         };
+    }
+
+    public static synchronized boolean isRunningTest() {
+        // do some caching to avoid checking every time
+        if (null == isRunningTest) {
+            boolean istest;
+
+            try {
+                // androidx only
+                Class.forName ("androidx.test.espresso.Espresso");
+                istest = true;
+            } catch (ClassNotFoundException e) {
+                istest = false;
+            }
+
+            isRunningTest = new AtomicBoolean(istest);
+        }
+
+        return isRunningTest.get();
     }
 }
