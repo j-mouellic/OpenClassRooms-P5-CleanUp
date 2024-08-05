@@ -36,9 +36,4 @@ public class ProjectRepository {
     public LiveData<List<Project>> getProjects() {
         return dao.getProjects();
     }
-
-    public void insertProject(Project project) {
-        Log.i("DEBUG", "INSERT PROJECT IN REPO");
-        dao.insertProjects(project);
-    }
 }

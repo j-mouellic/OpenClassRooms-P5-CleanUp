@@ -81,6 +81,12 @@ public abstract class Database extends RoomDatabase {
         };
     }
 
+    /**
+     * Determines if the application is running in a test environment.
+     * This method checks for the presence of a specific class used in testing.
+     *
+     * @return True if the application is running in a test environment, false otherwise.
+     */
     public static synchronized boolean isRunningTest() {
         // do some caching to avoid checking every time
         if (null == isRunningTest) {

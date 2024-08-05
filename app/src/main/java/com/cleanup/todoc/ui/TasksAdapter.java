@@ -48,7 +48,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.TaskViewHold
     // @NonNull final List<Task> tasks, ---  this.tasks = tasks;
     TasksAdapter(@NonNull final DeleteTaskListener deleteTaskListener) {
         this.deleteTaskListener = deleteTaskListener;
-        projects = new ArrayList<>(); // Eviter null pointer exception
+        projects = new ArrayList<>();
         tasks = new ArrayList<>();
     }
 
